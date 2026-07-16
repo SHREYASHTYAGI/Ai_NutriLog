@@ -5,6 +5,21 @@ import Select from 'react-select';
 import Input from "../components/Input";
 import { useMemo, useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
+import ProtienChart from "../components/charts/ProteinChart"
+import MacroChart from "../components/charts/MacroChart";
+
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+} from "chart.js";
+
+ChartJS.register(
+  ArcElement,
+  Tooltip,
+  Legend
+);
 
 
 
@@ -35,6 +50,15 @@ const [quant, setQuant] = useState("");
   const [foodLog, setFoodLog] = useState<FoodLog[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
 const [editQuantity, setEditQuantity] = useState("");
+const [currWeight, setCurrWeight] = useState<number | "">("");
+const proteinGoal =
+  currWeight === "" ? 0 : Math.round(currWeight * 1.8);
+
+const calorieGoal =
+  currWeight === "" ? 0 : Math.round(currWeight * 35);
+
+console.log(currWeight)
+
 
   
   const options = useMemo(
@@ -47,6 +71,21 @@ const [editQuantity, setEditQuantity] = useState("");
   []
 );
 
+
+const totalProtein = foodLog.reduce(
+  (sum, item) => sum + item.protein,
+  0
+);
+
+const totalCarbs = foodLog.reduce(
+  (sum, item) => sum + item.carbs,
+  0
+);
+
+const totalFat = foodLog.reduce(
+  (sum, item) => sum + item.fat,
+  0
+);
  
 const deleteFood=(id:Number)=>{
        setFoodLog((e)=>e.filter((item)=>item.id!==id));
@@ -192,9 +231,56 @@ if (existingFood) {
    
 
     {/* Target */}
-    <div className="h-44 rounded-3xl border border-white/10 bg-[#171717] p-6">
-      Daily Target
+    <div className="h-60 rounded-3xl border border-white/10 bg-[#171717] p-6 flex flex-col justify-between">
+
+  <div>
+    <h2 className="text-xl font-semibold text-white">
+      🎯 Today's Target
+    </h2>
+
+    <p className="mt-1 text-sm text-gray-400">
+      Enter your current weight
+    </p>
+  </div>
+
+  <input
+    type="number"
+    placeholder="Weight (kg)"
+    value={currWeight}
+    onChange={(e) =>
+      setCurrWeight(
+        e.target.value === "" ? "" : Number(e.target.value)
+      )
+    }
+    className="mt-3 rounded-xl border border-white/10 bg-[#202020] px-4 py-2 text-white outline-none transition focus:border-green-500"
+  />
+
+  <div className="mt-4 flex justify-between">
+
+    <div className="flex flex-col rounded-2xl bg-[#202020] px-4 py-3 w-[48%]">
+      <span className="text-sm text-gray-400">
+        Protein
+      </span>
+
+      <span className="mt-1 text-2xl font-bold text-green-400">
+        🥩 {proteinGoal}g
+      </span>
     </div>
+
+    <div className="flex flex-col rounded-2xl bg-[#202020] px-4 py-3 w-[48%]">
+      <span className="text-sm text-gray-400">
+        Calories
+      </span>
+
+      <span className="mt-1 text-2xl font-bold text-orange-400">
+        🔥 {calorieGoal}
+      </span>
+    </div>
+
+  </div>
+
+</div>
+     
 
   </div>
   
@@ -206,11 +292,18 @@ if (existingFood) {
     <div className="grid grid-cols-2 gap-6">
 
       <div className="h-90 rounded-3xl border border-white/10 bg-[#171717] p-6">
-        Protein Chart
+     
+              <ProtienChart consumed={totalProtein}
+                   goal={proteinGoal} />
+
       </div>
 
       <div className="h-90 rounded-3xl border border-white/10 bg-[#171717] p-6">
-        Nutrition Chart
+         <MacroChart
+        protein={totalProtein}
+         carbs={totalCarbs}
+         fat={totalFat}
+       />     
       </div>
 
     </div>
