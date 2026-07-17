@@ -32,6 +32,18 @@ const existingUser = await User.findOne({ email });
             });
         }
 
+
+      const existingOtp= await OTP.findOne({email});
+
+      if( existingOtp && Date.now()-existingOtp.lastSentAt.getTime()<60*1000){
+         const remaining = Math.ceil((60000 - (Date.now() - existingOtp.lastSentAt.getTime())) / 1000);
+
+        return res.status(429).json({
+               success:false,
+                remaining
+         })
+      }
+
         const otp = (Math.floor(100000 + Math.random() * 900000)).toString();
 
         await OTP.deleteMany({ email });
@@ -41,7 +53,8 @@ const existingUser = await User.findOne({ email });
 await OTP.create({
     email,
     otp: hashedOTP,
-    expiresAt: new Date(Date.now() + 5 * 60 * 1000)
+    expiresAt: new Date(Date.now() + 5 * 60 * 1000),
+    lastSentAt: new Date()
 });
 
         await sendEmail(

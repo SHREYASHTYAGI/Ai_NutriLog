@@ -1,18 +1,23 @@
-type ButtonProps={
-    text:string;
-    type?:"button"|"submit";
-    loading?:boolean;
+type ButtonProps = {
+  text: string;
+  type?: "button" | "submit";
+  loading?: boolean;
+  disabled?: boolean;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
 };
 
 export default function Button({
-    text,
-    type="button",
-    loading=false,
-}:ButtonProps){
-    return (
-         <button
+  text,
+  type = "button",
+  loading = false,
+  disabled = false,
+  onClick
+}: ButtonProps) {
+  return (
+    <button
       type={type}
-      disabled={loading}
+      disabled={loading || disabled}
+      onClick={onClick}
       className="
         w-full
         rounded-xl
@@ -30,5 +35,5 @@ export default function Button({
     >
       {loading ? "Please wait..." : text}
     </button>
-    )
+  );
 }

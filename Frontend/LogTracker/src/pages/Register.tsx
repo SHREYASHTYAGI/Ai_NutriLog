@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import api from "../api/axios";
@@ -14,26 +14,32 @@ export default function Register(){
     
     const [otpSent, setOtpSent] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [cooldown, setCooldown] = useState(0);
 
-    const handleSentOTP=async(e:React.FormEvent)=>{
-        e.preventDefault();
-        setLoading(true);
+const handleSentOTP = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
 
-        try{
-            const response=await api.post("/otp",{
-                email
-            })
-           alert(response.data.message);
-            setOtpSent(true);
+  try {
+    const response = await api.post("/otp", {
+      email,
+    });
 
-        }
-        catch(error:any){
-        alert(error.response?.data?.message || error.message);
-        }
-        finally{
-            setLoading(false);
-        }
+    alert(response.data.message);
+
+    setOtpSent(true);
+    setCooldown(60); // <-- Start countdown
+
+  } catch (error: any) {
+    alert(error.response?.data?.message || error.message);
+
+    if (error.response?.status === 429) {
+      setCooldown(error.response.data.remaining);
     }
+  } finally {
+    setLoading(false);
+  }
+};
      
     const handleRegister=async(e:React.FormEvent)=>{
         e.preventDefault();
@@ -57,6 +63,19 @@ export default function Register(){
         }
     }
 
+    useEffect(()=>{
+          if(cooldown<=0) return;
+          
+          const timer=setInterval(()=>{
+            setCooldown((e)=>e-1);
+          },1000);
+
+          return()=>clearInterval(timer);
+    },[cooldown])
+
+
+     
+
 
     return (
     <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4">
@@ -78,7 +97,11 @@ export default function Register(){
                     <Input placeholder="Email" value={email} 
                     onChange={(e)=>setEmail(e.target.value)}
                     />
-                    <Button type="submit" text="Send OTP" loading={loading} ></Button>
+                    <Button
+                      type="submit"
+                      loading={loading}
+                       text="Send OTP"
+                    />
                  </>)
                  :
                  (<>
@@ -113,6 +136,16 @@ export default function Register(){
                         loading={loading}
 
                      />
+                     <Button 
+                     type="button"
+                     onClick={handleSentOTP} 
+                     disabled={cooldown > 0||loading} 
+                      text={
+                        cooldown > 0
+                          ? `Resend OTP in (${cooldown}s)`
+                          : "Resend OTP"
+                      } />
+
                         
                  </>)}
             
