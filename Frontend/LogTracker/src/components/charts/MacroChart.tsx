@@ -49,7 +49,7 @@ export default function MacroChart({
 
         labels: {
           color: "#fff",
-          padding: 20,
+          
           usePointStyle: true,
           pointStyle: "circle" as const,
         },

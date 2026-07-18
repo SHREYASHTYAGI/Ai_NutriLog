@@ -1,9 +1,9 @@
 type ButtonProps = {
   text: string;
   type?: "button" | "submit";
-  loading?: boolean;
+  loading?: boolean; // (?) -> means optional btw...
   disabled?: boolean;
-  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>; //added this feature so that there i can pass optional click handler
 };
 
 export default function Button({

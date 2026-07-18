@@ -3,7 +3,7 @@ import Calendar from "react-calendar";
 import Fdata from "../data/Fdata.json"
 import Select from 'react-select';
 import Input from "../components/Input";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import ProtienChart from "../components/charts/ProteinChart"
 import MacroChart from "../components/charts/MacroChart";
@@ -47,12 +47,34 @@ export default function Dashboard() {
 
 const [selectedOption, setSelectedOption] = useState<FoodOption | null>(null);
 const [quant, setQuant] = useState("");
-  const [foodLog, setFoodLog] = useState<FoodLog[]>([]);
+  const [foodLog, setFoodLog] = useState<FoodLog[]>(()=>{
+       const draft=localStorage.getItem("foodDraft");
+     return draft?JSON.parse(draft):[];
+
+  });
+   
   const [editingId, setEditingId] = useState<number | null>(null);
 const [editQuantity, setEditQuantity] = useState("");
-const [currWeight, setCurrWeight] = useState<number | "">("");
-const proteinGoal =
-  currWeight === "" ? 0 : Math.round(currWeight * 1.8);
+const [currWeight, setCurrWeight] = useState<number | "">(()=>{
+    const wDraft=localStorage.getItem("weD");
+    return wDraft?Number(wDraft):"";
+});
+
+const proteinGoal =currWeight === "" ? 0 : Math.round(currWeight * 1.8);
+
+
+  useEffect(()=>{
+     localStorage.setItem("foodDraft",JSON.stringify(foodLog))
+  },[foodLog])
+
+  useEffect(()=>{
+    if(currWeight==""){
+      localStorage.removeItem("weD");
+    }
+    else{
+        localStorage.setItem("weD",JSON.stringify(currWeight))
+    }
+  },[currWeight])
 
 const calorieGoal =
   currWeight === "" ? 0 : Math.round(currWeight * 35);
@@ -178,279 +200,272 @@ if (existingFood) {
      setEditQuantity("");
  }
 
+ const customStyles = {
+  control: (provided: any, state: any) => ({
+    ...provided,
+    backgroundColor: "#171717",
+    borderColor: state.isFocused ? "#f97316" : "#404040",
+    boxShadow: state.isFocused ? "0 0 0 1px #f97316" : "none",
+    "&:hover": {
+      borderColor: "#f97316",
+    },
+    borderRadius: "12px",
+    minHeight: "48px",
+    color: "white",
+  }),
+
+  menu: (provided: any) => ({
+    ...provided,
+    backgroundColor: "#171717",
+    borderRadius: "12px",
+    overflow: "hidden",
+  }),
+
+  option: (provided: any, state: any) => ({
+  ...provided,
+  backgroundColor: state.isSelected
+    ? "#f97316"
+    : state.isFocused
+    ? "rgba(249, 115, 22, 0.18)"
+    : "#171717",
+  color: "white",
+  cursor: "pointer",
+  backdropFilter: "blur(10px)",
+  WebkitBackdropFilter: "blur(10px)",
+  border: state.isFocused
+    ? "1px solid rgba(249, 115, 22, 0.35)"
+    : "1px solid transparent",
+  transition: "all 0.2s ease",
+}),
+
+  singleValue: (provided: any) => ({
+    ...provided,
+    color: "white",
+  }),
+
+  input: (provided: any) => ({
+    ...provided,
+    color: "white",
+  }),
+
+  placeholder: (provided: any) => ({
+    ...provided,
+    color: "#9ca3af",
+  }),
+
+  dropdownIndicator: (provided: any, state: any) => ({
+    ...provided,
+    color: state.isFocused ? "#f97316" : "#9ca3af",
+    "&:hover": {
+      color: "#f97316",
+    },
+  }),
+
+  indicatorSeparator: () => ({
+    display: "none",
+  }),
+};
+
  
 
 
   return (
 
-<div className="min-h-screen w-full bg-[#0B0707] text-white">
-  <div className="w-full px-8 lg:px-12 py-8">
-       <div className="grid grid-cols-12 gap-6">
+<div className="min-h-screen w-full overflow-x-hidden bg-[#0B0707] text-white">
+  <div className="w-full px-2 py-4 pb-24 sm:px-3 sm:py-6 lg:px-4 lg:py-8">
+    <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-12 lg:gap-6">
+      <div className="order-1 space-y-4 sm:space-y-6 lg:col-span-4 lg:order-0">
+        <div className="order-1 rounded-2xl border border-white/10 bg-[#171717] p-3 sm:rounded-3xl sm:p-6">
+          <Calendar />
+        </div>
 
-  {/* LEFT */}
-  <div className="col-span-4 space-y-6">
+        <div className="order-4 rounded-2xl border border-white/10 bg-[#171717] p-3 sm:rounded-3xl sm:p-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="w-full sm:flex-1">
+              <Select
+                value={selectedOption}
+                onChange={setSelectedOption}
+                options={options}
+                styles={customStyles}
+              />
+            </div>
 
-    
-    <div className="h-95 rounded-3xl border border-white/10 bg-[#171717] p-6">
-      <Calendar/>
-    </div>
+            <div className="w-full sm:w-24">
+              <Input
+                placeholder="Qty"
+                value={quant}
+                onChange={(e) => setQuant(e.target.value)}
+              />
+            </div>
+          </div>
 
+          <div className="mt-4 flex justify-center">
+            <button
+              onClick={addFood}
+              className="
+                w-full
+                rounded-xl
+                bg-linear-to-r from-orange-500 to-amber-500
+                py-3
+                text-lg
+                font-semibold
+                text-white
+                transition-all
+                duration-300
+                hover:scale-105
+                hover:shadow-xl
+                hover:shadow-orange-500/20
+                hover:brightness-105
+                hover:from-orange-600
+                hover:to-orange-400
+                active:scale-95
+                active:shadow-md
+                focus:outline-none
+                focus:ring-2
+                focus:ring-orange-500/30
+                sm:w-56
+              "
+            >
+              + Add Food
+            </button>
+          </div>
+        </div>
 
-   
-    
-    <div className="rounded-3xl border border-white/10 bg-[#171717] p-6">
+        <div className="order-5 flex h-auto flex-col justify-between rounded-2xl border border-white/10 bg-[#171717] p-3 sm:h-60 sm:rounded-3xl sm:p-6">
+          <div>
+            <h2 className="text-xl font-semibold text-white">🎯 Today's Target</h2>
+            <p className="mt-1 text-sm text-gray-400">Enter your current weight</p>
+          </div>
 
-  {/* First Row */}
-  <div className="flex items-center gap-3">
-
-    <div className="flex-1">
-      <Select
-        value={selectedOption}
-        onChange={setSelectedOption}
-        options={options}
-      />
-    </div>
-
-    <div className="w-15 flex items-center justify-center">
-      <Input
-        placeholder="Qty"
-        value={quant}
-        onChange={(e) => setQuant(e.target.value)}
-      />
-    </div>
-
-  </div>
-
-  {/* Second Row */}
-  <div className="mt-2 h-8 bg-amber-800 text-2xl w-2xs flex items-center   justify-center">
-    <button className="w-100"  onClick={addFood} >Add</button>
-  </div>
-
-</div>
-
-   
-
-    {/* Target */}
-    <div className="h-60 rounded-3xl border border-white/10 bg-[#171717] p-6 flex flex-col justify-between">
-
-  <div>
-    <h2 className="text-xl font-semibold text-white">
-      🎯 Today's Target
-    </h2>
-
-    <p className="mt-1 text-sm text-gray-400">
-      Enter your current weight
-    </p>
-  </div>
-
-  <input
-    type="number"
-    placeholder="Weight (kg)"
-    value={currWeight}
-    onChange={(e) =>
-      setCurrWeight(
-        e.target.value === "" ? "" : Number(e.target.value)
-      )
-    }
-    className="mt-3 rounded-xl border border-white/10 bg-[#202020] px-4 py-2 text-white outline-none transition focus:border-green-500"
-  />
-
-  <div className="mt-4 flex justify-between">
-
-    <div className="flex flex-col rounded-2xl bg-[#202020] px-4 py-3 w-[48%]">
-      <span className="text-sm text-gray-400">
-        Protein
-      </span>
-
-      <span className="mt-1 text-2xl font-bold text-green-400">
-        🥩 {proteinGoal}g
-      </span>
-    </div>
-
-    <div className="flex flex-col rounded-2xl bg-[#202020] px-4 py-3 w-[48%]">
-      <span className="text-sm text-gray-400">
-        Calories
-      </span>
-
-      <span className="mt-1 text-2xl font-bold text-orange-400">
-        🔥 {calorieGoal}
-      </span>
-    </div>
-
-  </div>
-
-</div>
-     
-
-  </div>
-  
-
-  {/* RIGHT */}
-  <div className="col-span-8 space-y-6">
-
-    {/* Charts */}
-    <div className="grid grid-cols-2 gap-6">
-
-      <div className="h-90 rounded-3xl border border-white/10 bg-[#171717] p-6">
-     
-              <ProtienChart consumed={totalProtein}
-                   goal={proteinGoal} />
-
-      </div>
-
-      <div className="h-90 rounded-3xl border border-white/10 bg-[#171717] p-6">
-         <MacroChart
-        protein={totalProtein}
-         carbs={totalCarbs}
-         fat={totalFat}
-       />     
-      </div>
-
-    </div>
-
-    {/* Food Log */}
-
-     
-
-    <div  className="  h-132.5 rounded-3xl border border-white/10 bg-[#171717] p-6">
-         {foodLog.length=== 0 ?(
-               <p className="text-gray-400">
-                   No food added yet.
-                </p>
-         ):(<div className="flex gap-5 flex-wrap items-center justify-center">
-  {foodLog.map((item) => (
-    <div
-      key={item.id}
-      className="
-        mb-4 w-60
-        rounded-2xl
-        border border-white/10
-        bg-[#1A1A1A]
-        p-4
-        transition-all
-        duration-300
-        hover:border-orange-500/50
-        hover:shadow-lg hover:shadow-orange-500/10
-      "
-    >
-      {/* Top */}
-      <div className="flex items-start justify-between">
-
-        <div>
-          <h3 className="flex items-center gap-2  font-semibold text-white">
-            <span className="text-2xl">{item.emoji}</span>
-            {item.name}
-          </h3>
-
-           {editingId===item.id ?
-               (<>
-                  <Input placeholder="update" value={editQuantity} onChange={(e)=>setEditQuantity(e.target.value)} />
-               
-               </>):(<>
-                 {item.quantity} {item.unit}
-               </>)
+          <input
+            type="number"
+            placeholder="Weight (kg)"
+            value={currWeight}
+            onChange={(e) =>
+              setCurrWeight(e.target.value === "" ? "" : Number(e.target.value))
             }
-        </div>
+            className="mt-3 rounded-xl border border-white/10 bg-[#202020] px-4 py-2 text-white outline-none transition focus:border-green-500"
+          />
 
-         
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:justify-between">
+            <div className="flex w-full flex-col rounded-2xl bg-[#202020] px-4 py-3 sm:w-[48%]">
+              <span className="text-sm text-gray-400">Protein</span>
+              <span className="mt-1 text-2xl font-bold text-green-400">🥩 {proteinGoal}g</span>
+            </div>
 
-      <div className="flex gap-1">
-             {editingId===item.id?
-          (<> 
-              <button  onClick={saveEdit} className="
-              rounded-lg
-              text-2xl
-               w-10
-               pb-2
-              text-gray-400
-              transition
-              hover:bg-orange-500/20
-              hover:text-orange-400
-            " >✔️</button>
-              <button  onClick={ ()=>{setEditingId(null) ,setEditQuantity("")} } className="
-              rounded-lg
-              p-2
-              text-gray-400
-              transition
-              hover:bg-red-500/20
-              hover:text-red-400
-            ">❌</button>
-           </>)
-          :
-          (<>
-             <button
-            className="
-              rounded-lg
-              p-2
-            
-              text-gray-400
-              transition
-              hover:bg-orange-500/20
-              hover:text-orange-400
-            "
-
-            onClick={()=>startEdit(item)}
-          >
-            <Pencil size={18} />
-          </button>
-
-          <button
-            className="
-              rounded-lg
-              p-2
-              text-gray-400
-              transition
-              hover:bg-red-500/20
-              hover:text-red-400
-            "
-
-            onClick={()=>deleteFood(item.id)}
-          >
-            <Trash2 size={18} />
-          </button>
-          </>)
-          }
+            <div className="flex w-full flex-col rounded-2xl bg-[#202020] px-4 py-3 sm:w-[48%]">
+              <span className="text-sm text-gray-400">Calories</span>
+              <span className="mt-1 text-2xl font-bold text-orange-400">🔥 {calorieGoal}</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Divider */}
-      <div className="my-4 h-px bg-white/10" />
+      <div className="order-2 space-y-4 sm:space-y-6 lg:col-span-8 lg:order-none">
+        <div className="order-2 grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
+          <div className="flex h-80 items-center justify-center rounded-2xl border border-white/10 bg-[#171717] p-3 sm:h-90 sm:rounded-3xl sm:p-6">
+            <ProtienChart consumed={totalProtein} goal={proteinGoal} />
+          </div>
 
-      {/* Nutrition */}
-      <div className="flex justify-between">
-
-        <div className="flex  flex-col items-center flex-1">
-          <span className="text-shadow-xs">🥩</span>
-          <p className="text-lg font-semibold text-orange-400">
-            {item.protein} g
-          </p>
-          <p className="text-xs text-gray-500">
-            Protein
-          </p>
+          <div className="flex h-80 items-center justify-center rounded-2xl border border-white/10 bg-[#171717] p-3 sm:h-90 sm:rounded-3xl sm:p-6">
+            <MacroChart protein={totalProtein} carbs={totalCarbs} fat={totalFat} />
+          </div>
         </div>
 
-        <div className="w-px bg-white/10"></div>
+        <div className="order-6 rounded-2xl border border-white/10 bg-[#171717] p-3 sm:rounded-3xl sm:p-6">
+          {foodLog.length === 0 ? (
+            <p className="text-gray-400">No food added yet.</p>
+          ) : (
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {foodLog.map((item) => (
+                <div
+                  key={item.id}
+                  className="
+                    w-full
+                    rounded-2xl
+                    border border-white/10
+                    bg-[#1A1A1A]
+                    p-4
+                    transition-all
+                    duration-300
+                    hover:border-orange-500/50
+                    hover:shadow-lg hover:shadow-orange-500/10
+                  "
+                >
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h3 className="flex items-center gap-2 font-semibold text-white">
+                        <span className="text-2xl">{item.emoji}</span>
+                        {item.name}
+                      </h3>
 
-        <div className="flex flex-col items-center flex-1">
-          <span className="text-2xs">🍚</span>
-          <p className="text-lg font-semibold text-yellow-400">
-            {item.carbs} g
-          </p>
-          <p className="text-xs text-gray-500">
-            Carbs
-          </p>
+                      {editingId === item.id ? (
+                        <>
+                          <Input placeholder="update" value={editQuantity} onChange={(e) => setEditQuantity(e.target.value)} />
+                        </>
+                      ) : (
+                        <>
+                          {item.quantity} {item.unit}
+                        </>
+                      )}
+                    </div>
+
+                    <div className="flex gap-1">
+                      {editingId === item.id ? (
+                        <>
+                          <button onClick={saveEdit} className="rounded-lg w-10 pb-2 text-2xl text-gray-400 transition hover:bg-orange-500/20 hover:text-orange-400">
+                            ✔️
+                          </button>
+                          <button onClick={() => { setEditingId(null); setEditQuantity(""); }} className="rounded-lg p-2 text-gray-400 transition hover:bg-red-500/20 hover:text-red-400">
+                            ❌
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            className="rounded-lg p-2 text-gray-400 transition hover:bg-orange-500/20 hover:text-orange-400"
+                            onClick={() => startEdit(item)}
+                          >
+                            <Pencil size={18} />
+                          </button>
+
+                          <button
+                            className="rounded-lg p-2 text-gray-400 transition hover:bg-red-500/20 hover:text-red-400"
+                            onClick={() => deleteFood(item.id)}
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="my-4 h-px bg-white/10" />
+
+                  <div className="flex justify-between">
+                    <div className="flex flex-1 flex-col items-center">
+                      <span className="text-shadow-xs">🥩</span>
+                      <p className="text-lg font-semibold text-orange-400">{item.protein} g</p>
+                      <p className="text-xs text-gray-500">Protein</p>
+                    </div>
+
+                    <div className="w-px bg-white/10"></div>
+
+                    <div className="flex flex-1 flex-col items-center">
+                      <span className="text-2xs">🍚</span>
+                      <p className="text-lg font-semibold text-yellow-400">{item.carbs} g</p>
+                      <p className="text-xs text-gray-500">Carbs</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-
       </div>
     </div>
-  ))}
-</div>
-      )}
-     </div>
 
-  </div>
-  <BottomNavbar/>
-</div>
+    <BottomNavbar />
   </div>
 </div>
 
