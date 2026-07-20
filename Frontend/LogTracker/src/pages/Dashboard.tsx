@@ -7,6 +7,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import ProtienChart from "../components/charts/ProteinChart"
 import MacroChart from "../components/charts/MacroChart";
+import api from "../api/axios";
+
 
 import {
   Chart as ChartJS,
@@ -60,6 +62,26 @@ const [currWeight, setCurrWeight] = useState<number | "">(()=>{
     return wDraft?Number(wDraft):"";
 });
 
+const [selectedDate,setSelectedDate]=useState(new Date());
+
+const handleDate=(date:Date)=>{
+
+     const clickDate=new Date(date);
+     const today=new Date();
+
+     clickDate.setHours(0,0,0,0);
+     today.setHours(0,0,0,0);
+
+     if(clickDate>today){
+      alert("Wanna travel to future...?");
+       return;
+     }
+
+     setSelectedDate(clickDate);
+}
+
+console.log(selectedDate);
+
 const proteinGoal =currWeight === "" ? 0 : Math.round(currWeight * 1.8);
 
 
@@ -80,6 +102,7 @@ const calorieGoal =
   currWeight === "" ? 0 : Math.round(currWeight * 35);
 
 console.log(currWeight)
+
 
 
   
@@ -200,6 +223,24 @@ if (existingFood) {
      setEditQuantity("");
  }
 
+
+ const handleSave=async()=>{
+    
+  try{
+     await api.post("/save",{
+             date:selectedDate,
+             foods:foodLog
+      })
+      alert("Saved Successfully✅")
+  }
+  catch(err:any){
+    alert(err.response?.data?.message);
+  }
+
+  
+      
+ }
+
  const customStyles = {
   control: (provided: any, state: any) => ({
     ...provided,
@@ -274,13 +315,14 @@ if (existingFood) {
 <div className="min-h-screen w-full overflow-x-hidden bg-[#0B0707] text-white">
   <div className="w-full px-2 py-4 pb-24 sm:px-3 sm:py-6 lg:px-4 lg:py-8">
     <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-12 lg:gap-6">
+      
       <div className="order-1 space-y-4 sm:space-y-6 lg:col-span-4 lg:order-0">
         <div className="order-1 rounded-2xl border border-white/10 bg-[#171717] p-3 sm:rounded-3xl sm:p-6">
-          <Calendar />
+          <Calendar onClickDay={handleDate} value={selectedDate}  />
         </div>
 
-        <div className="order-4 rounded-2xl border border-white/10 bg-[#171717] p-3 sm:rounded-3xl sm:p-6">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="order-4 rounded-2xl border  border-white/10 bg-[#171717] p-3 sm:rounded-3xl sm:p-6">
+          <div className="flex flex-row gap-3 sm:flex-1 sm:items-center">
             <div className="w-full sm:flex-1">
               <Select
                 value={selectedOption}
@@ -361,7 +403,7 @@ if (existingFood) {
         </div>
       </div>
 
-      <div className="order-2 space-y-4 sm:space-y-6 lg:col-span-8 lg:order-none">
+      <div className="order-2 space-y-4 sm:space-y-6 lg:col-span-8 lg:order-0">
         <div className="order-2 grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
           <div className="flex h-80 items-center justify-center rounded-2xl border border-white/10 bg-[#171717] p-3 sm:h-90 sm:rounded-3xl sm:p-6">
             <ProtienChart consumed={totalProtein} goal={proteinGoal} />
@@ -371,12 +413,21 @@ if (existingFood) {
             <MacroChart protein={totalProtein} carbs={totalCarbs} fat={totalFat} />
           </div>
         </div>
+       
 
-        <div className="order-6 rounded-2xl border border-white/10 bg-[#171717] p-3 sm:rounded-3xl sm:p-6">
+        <div className="order-6 flex flex-col gap-6  rounded-2xl border border-white/10 bg-[#171717] p-3 sm:rounded-3xl sm:p-6">
+              <div className="flex justify-end">
+
+                {foodLog.length===0?(<></>)
+                :(<><button onClick={handleSave}   className="w-32 rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700 hover:scale-105  active:scale-95 transition">
+                   Save
+                 </button></>)}
+                 
+               </div>
           {foodLog.length === 0 ? (
             <p className="text-gray-400">No food added yet.</p>
           ) : (
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
               {foodLog.map((item) => (
                 <div
                   key={item.id}
@@ -461,6 +512,7 @@ if (existingFood) {
               ))}
             </div>
           )}
+         
         </div>
       </div>
     </div>

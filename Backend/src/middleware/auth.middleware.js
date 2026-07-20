@@ -12,10 +12,11 @@ const authMiddleware=async(req,res,next)=>{
          }
 
          const verified=jwt.verify(token,process.env.ACC_SEC);
-         const user=await user.findById(verified.id);
+         const user=await User.findById(verified.id);
 
          if(!user){
             return res.status(401).json({
+                success:false,
                 message:"User not found"
             })
          }
@@ -25,7 +26,7 @@ const authMiddleware=async(req,res,next)=>{
          next();
     }
     catch(err){
-        res.status(500).json({
+        res.status(401).json({
             message:err.message
         })
     }

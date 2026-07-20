@@ -1,10 +1,16 @@
 import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   Home,
   BarChart3,
   Flame,
   User,
+  LogOut,
 } from "lucide-react";
+import api from "../api/axios";
+import { useAuth } from "../context/AuthContext";
+
+
 
 
 const navItems=[
@@ -28,10 +34,28 @@ const navItems=[
        name:"Profile",
        path:"/profile",
        icon:User
+    },{
+      name:"Logout",
+      icon:LogOut
     }
 ]
 
 export default function BottomNavbar(){
+
+  const navigate=useNavigate();
+  const { setIsLoggedIn } = useAuth();
+
+    const logOut=async()=>{
+      try{
+           await api.post("/logout");
+          setIsLoggedIn(false);
+          navigate("/login");
+      }
+      catch(err:any){
+        alert(err) 
+      }
+       
+    }
 
          return(
            <nav
@@ -58,8 +82,22 @@ export default function BottomNavbar(){
                {navItems.map((item) => {
     const Icon = item.icon;
 
+      if(item.name==="Logout"){
+         return (
+      <button
+        key={item.name}
+         onClick={logOut}
+        className="flex h-10 items-center gap-2 rounded-lg p-2 text-red-400 hover:text-red-500 transition"
+      >
+        <Icon size={20} />
+        <span>{item.name}</span>
+      </button>
+    );
+      }
+
     return (
-      <NavLink key={item.path} to={item.path}>
+      <NavLink key={item.name} to={item.path!}>
+
         {({ isActive }) => (
           <div
             className={`flex  h-10 items-center gap-2 p-2 rounded-lg ${

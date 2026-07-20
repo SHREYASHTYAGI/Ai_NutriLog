@@ -1,33 +1,37 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 import Input from "../components/Input";
 import Button from "../components/Button";
 import api from "../api/axios";
+import { useAuth } from "../context/AuthContext";
 
+export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { checkA, setIsLoggedIn } = useAuth();
 
-export default function Login(){
-    const [email,setEmail]=useState("");
-    const [password,setPassword]=useState("");
-    const [loading, setLoading] = useState(false);
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await api.post("/login", {
+        email,
+        password,
+      });
 
-   const handleLogin =async (e:React.FormEvent)=>{
-     e.preventDefault();
-      setLoading(true);
-      try{
-           const response= await api.post("/login",{
-            email,
-            password
-           });
-           console.log(response)
-      }
-      catch(err:any){
-              console.log(err.response?.data?.message || err.message);
-      }finally {
-        setLoading(false);
-   }
-};
+      await checkA();
+      setIsLoggedIn(true);
+      navigate("/dashboard");
+    } catch (err: any) {
+      console.log(err.response?.data?.message || err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
     return (
 
