@@ -8,7 +8,11 @@ const foodSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    foodName: {
+    emoji:{
+      type:String,
+      required:true
+    },
+    name: {
       type: String,
       required: true,
     },
@@ -28,7 +32,7 @@ const foodSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    fats: {
+    fat: {
       type: Number,
       required: true,
     },
@@ -43,7 +47,7 @@ const foodLogSchema=new mongoose.Schema({
         ref:'User'
      },
      date:{
-        type:Date,
+        type:String,
         required:true,
      },
      foods:{

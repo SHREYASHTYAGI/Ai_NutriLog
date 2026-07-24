@@ -62,6 +62,23 @@ const [currWeight, setCurrWeight] = useState<number | "">(()=>{
     return wDraft?Number(wDraft):"";
 });
 
+
+
+const [streak, setStreak] = useState(0);
+
+useEffect(() => {
+  const fetchStreak = async () => {
+    try {
+      const res = await api.get("/streak");
+      setStreak(res.data.streak);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  fetchStreak();
+}, []);
+
 const [selectedDate,setSelectedDate]=useState(new Date());
 
 const handleDate=(date:Date)=>{
@@ -79,6 +96,17 @@ const handleDate=(date:Date)=>{
 
      setSelectedDate(clickDate);
 }
+
+  const fetchFoodLog=async()=>{
+      const res= await api.get(`/foodLog/${selectedDate.toLocaleDateString("en-CA")}`);
+
+       setFoodLog(res.data.foods);
+
+  }
+
+  useEffect(()=>{
+     fetchFoodLog();
+  },[selectedDate])
 
 console.log(selectedDate);
 
@@ -116,7 +144,7 @@ console.log(currWeight)
   []
 );
 
-
+{/*calculations*/}
 const totalProtein = foodLog.reduce(
   (sum, item) => sum + item.protein,
   0
@@ -131,6 +159,10 @@ const totalFat = foodLog.reduce(
   (sum, item) => sum + item.fat,
   0
 );
+
+const totalCal=foodLog.reduce(
+  (sum,item)=>sum+item.calories,0
+)
  
 const deleteFood=(id:Number)=>{
        setFoodLog((e)=>e.filter((item)=>item.id!==id));
@@ -142,13 +174,13 @@ const deleteFood=(id:Number)=>{
      const food=selectedOption.data;
      const quantity=Number(quant);
 const existingFood = foodLog.find(
-  (item) => item.foodId === food.id
+  (item) => String(item.foodId) === String(food.id)
 );
 
 if (existingFood) {
   setFoodLog((prev) =>
     prev.map((item) => {
-      if (item.foodId !== food.id) return item;
+      if (String(item.foodId) !== String(food.id)) return item;
 
       const newQuantity = item.quantity + quantity;
 
@@ -177,9 +209,10 @@ if (existingFood) {
       };
       
      setFoodLog((e) => [...e, newFood]); 
-     setSelectedOption(null)
-     setQuant("");
 }
+
+setSelectedOption(null)
+setQuant("");
       
   }
   
@@ -224,22 +257,19 @@ if (existingFood) {
  }
 
 
- const handleSave=async()=>{
-    
-  try{
-     await api.post("/save",{
-             date:selectedDate,
-             foods:foodLog
-      })
-      alert("Saved Successfully✅")
+const handleSave = async () => {
+  try {
+    await api.post("/save", {
+      date: selectedDate.toLocaleDateString("en-CA"),
+      foods: foodLog
+    });
+
+    alert("Saved Successfully✅");
   }
   catch(err:any){
-    alert(err.response?.data?.message);
+    alert(err.response?.data?.message || "Save failed");
   }
-
-  
-      
- }
+}
 
  const customStyles = {
   control: (provided: any, state: any) => ({
@@ -306,6 +336,17 @@ if (existingFood) {
     display: "none",
   }),
 };
+
+
+const calHit= totalCal>=calorieGoal*0.95 && totalCal<=calorieGoal*1.05;
+
+const proHit=totalProtein>=proteinGoal;
+
+const streakDay=calHit&&proHit;
+
+
+
+
 
  
 
@@ -392,14 +433,15 @@ if (existingFood) {
           <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:justify-between">
             <div className="flex w-full flex-col rounded-2xl bg-[#202020] px-4 py-3 sm:w-[48%]">
               <span className="text-sm text-gray-400">Protein</span>
-              <span className="mt-1 text-2xl font-bold text-green-400">🥩 {proteinGoal}g</span>
+              <span className="mt-1 text-2xl font-bold text-green-400">🥩 <span className="text-green-300">{(totalProtein.toFixed(0))}</span>/{proteinGoal}g</span>
             </div>
 
             <div className="flex w-full flex-col rounded-2xl bg-[#202020] px-4 py-3 sm:w-[48%]">
               <span className="text-sm text-gray-400">Calories</span>
-              <span className="mt-1 text-2xl font-bold text-orange-400">🔥 {calorieGoal}</span>
+              <span className="mt-1 text-2xl font-bold text-orange-400">🔥 <span className="text-orange-300" >{(totalCal.toFixed(0))}</span>/{calorieGoal}</span>
             </div>
           </div>
+           <h2>{streak}</h2>
         </div>
       </div>
 
@@ -427,6 +469,7 @@ if (existingFood) {
           {foodLog.length === 0 ? (
             <p className="text-gray-400">No food added yet.</p>
           ) : (
+            <div className="max-h-[420px] overflow-y-auto pr-2">
             <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
               {foodLog.map((item) => (
                 <div
@@ -510,6 +553,7 @@ if (existingFood) {
                   </div>
                 </div>
               ))}
+              </div>
             </div>
           )}
          

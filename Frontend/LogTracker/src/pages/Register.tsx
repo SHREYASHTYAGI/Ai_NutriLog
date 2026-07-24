@@ -2,14 +2,18 @@ import React, { useEffect, useState } from "react";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import api from "../api/axios";
-import  {Link}  from "react-router-dom";
+import  {Link, useNavigate}  from "react-router-dom";
 
 
 export default function Register(){
 
+    const navigate = useNavigate();
+
     const [name,setName]=useState("");
     const [email,setEmail]=useState("");
     const [password,setPassword]=useState("");
+    const [weight,setWeight]=useState("");
+    const [height,setHeight]=useState("");
     const [otp,setOtp]=useState("");
     
     const [otpSent, setOtpSent] = useState(false);
@@ -50,13 +54,17 @@ const handleSentOTP = async (e: React.FormEvent) => {
                   name,
                   email,
                   password,
+                  weight: Number(weight),
+                  height: Number(height),
                   otp
             })
             alert(response.data.message)
+            navigate('/login')
              
         }
         catch(err:any){
-            console.log(err.response?.data?.mesaage||err.message);
+            alert(err.response?.data?.message || err.message);
+            console.error(err.response?.data?.message || err.message);
         }
         finally{
             setLoading(false);
@@ -119,9 +127,24 @@ const handleSentOTP = async (e: React.FormEvent) => {
                      />
 
                       <Input
-                       placeholder="password"
+                       type="password"
+                       placeholder="Pass (8+ chars, upper, lower, num, symbol)"
                        value={password}
                        onChange={(e)=>setPassword(e.target.value)}
+                     />
+
+                     <Input
+                       type="number"
+                       placeholder="Weight (kg)"
+                       value={weight}
+                       onChange={(e)=>setWeight(e.target.value)}
+                     />
+
+                     <Input
+                       type="number"
+                       placeholder="Height (cm)"
+                       value={height}
+                       onChange={(e)=>setHeight(e.target.value)}
                      />
 
                       <Input

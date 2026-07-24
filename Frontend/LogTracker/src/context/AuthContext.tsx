@@ -20,6 +20,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await api.get("/getme");
       setIsLoggedIn(true);
+     //console.log(res)
     } catch {
       setIsLoggedIn(false);
     }

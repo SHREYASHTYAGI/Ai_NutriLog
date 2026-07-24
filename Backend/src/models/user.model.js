@@ -21,6 +21,22 @@ const userSchema=new mongoose.Schema({
         required:[true,"Password is required"],
         type:String,
     },
+
+  weight: {
+    type: Number,
+    required: true,
+  },
+  height: {
+    type: Number,
+    required: true,
+  },
+    calorieGoal: {
+      type: Number,
+    },
+    
+    proteinGoal: {
+      type: Number,
+    },
    
 },
 {timestamps:true})

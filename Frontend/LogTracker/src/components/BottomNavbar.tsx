@@ -58,26 +58,37 @@ export default function BottomNavbar(){
     }
 
          return(
-           <nav
+           
+         
+
+                 <nav
              className="
-               fixed
-               bottom-6
-               left-1/2
-               z-50
-               -translate-x-1/2
-               rounded-full
-               border
-               border-white/10
-               bg-[#181818]/90
-               px-3
-               py-2
-               backdrop-blur-xl
-               shadow-2xl
-               
-               flex
-               justify-between
-               items-center
-             "
+                     fixed
+                     bottom-2
+                     left-1/2
+                     z-50
+                     w-[90%]
+                     max-w-xl
+                     max-sm:w-[95%]
+                     -translate-x-1/2
+                     
+                     rounded-full
+                     border
+                     border-white/10
+                     bg-[#181818]/90
+                     backdrop-blur-xl
+                     sm:w-full
+                     px-2
+                     sm:px-3
+                     py-2
+                     
+                     flex
+                     items-center
+                     justify-between
+                     gap-1
+                     
+                     shadow-amber-100
+                "
            >
                {navItems.map((item) => {
     const Icon = item.icon;
@@ -88,9 +99,10 @@ export default function BottomNavbar(){
         key={item.name}
          onClick={logOut}
         className="flex h-10 items-center gap-2 rounded-lg p-2 text-red-400 hover:text-red-500 transition"
+        title="Logout"
       >
         <Icon size={20} />
-        <span>{item.name}</span>
+        <span className="hidden sm:inline">{item.name}</span>
       </button>
     );
       }
@@ -104,6 +116,7 @@ export default function BottomNavbar(){
               isActive
                 ?"text-orange-500 text-xl ":""
             }`}
+            title={item.name}
           >
             <Icon size={20} />
             <span>{item.name}</span>
@@ -112,7 +125,7 @@ export default function BottomNavbar(){
       </NavLink>
     );
 })}
-         </nav>
+         </nav>   
     )
     
 }

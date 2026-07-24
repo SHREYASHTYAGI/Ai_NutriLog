@@ -77,8 +77,8 @@ await OTP.create({
 
 const registeredUser=async(req,res)=>{
     try{
-        const {name,email,password,otp}=req.body;
-        if (!name || !email || !password || !otp) {
+        const {name,email,password,weight,height,otp}=req.body;
+        if (!name || !email || !password || !weight || !height || !otp) {
     return res.status(400).json({
         message: "All fields are required"
     });
@@ -126,12 +126,19 @@ if (!isValidOTP) {
         }
 
         const hashedPass=await bcrypt.hash(password,10);
-
+        const numericWeight = Number(weight);
+        const numericHeight = Number(height);
+        const proteinGoal = Math.round(numericWeight * 1.7);
+        const calorieGoal = Math.round(numericWeight * 33);
 
         const user=await User.create({
             name,
             email,
-            password:hashedPass
+            password:hashedPass,
+            weight: numericWeight,
+            height: numericHeight,
+            calorieGoal,
+            proteinGoal
         });
 
        await OTP.deleteOne({ email });
