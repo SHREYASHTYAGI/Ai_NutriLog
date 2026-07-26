@@ -338,19 +338,6 @@ const handleSave = async () => {
 };
 
 
-const calHit= totalCal>=calorieGoal*0.95 && totalCal<=calorieGoal*1.05;
-
-const proHit=totalProtein>=proteinGoal;
-
-const streakDay=calHit&&proHit;
-
-
-
-
-
- 
-
-
   return (
 
 <div className="min-h-screen w-full overflow-x-hidden bg-[#0B0707] text-white">

@@ -1,45 +1,36 @@
-//defining the foramt of props
-
-type InputProps={
-    placeholder:string,
-    type?:string,
-    value:string,
-    disabled?:boolean,
-    onChange:(e:React.ChangeEvent<HTMLInputElement>)=>void;
+type InputProps = {
+  placeholder: string;
+  type?: string;
+  value: string;
+  disabled?: boolean;
+  id?: string;
+  name?: string;
+  className?: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
-
 
 export default function Input({
   type = "text",
   placeholder,
   value,
-  disabled=false,
+  disabled = false,
+  id,
+  name,
+  className = "",
   onChange,
 }: InputProps) {
   return (
     <input
-  type={type}
-  placeholder={placeholder}
-  value={value}
-  disabled={disabled}
-  onChange={onChange}
-  className="
-    w-full
-    rounded-xl
-    border
-    border-slate-700
-    bg-slate-800
-    px-4
-    py-3
-    text-white
-    placeholder:text-slate-400
-    outline-none
-    transition-all
-    duration-200
-    focus:border-emerald-500
-    focus:ring-2
-    focus:ring-emerald-500/20
-  "
-/>
+      id={id}
+      name={name}
+      type={type}
+      placeholder={placeholder}
+      value={value}
+      disabled={disabled}
+      onChange={onChange}
+      className={
+        `w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-slate-400 transition duration-200 outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 backdrop-blur-sm ${className}`
+      }
+    />
   );
 }
