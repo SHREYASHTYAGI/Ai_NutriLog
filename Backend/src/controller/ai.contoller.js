@@ -12,10 +12,6 @@ const { foodLogModel}=require("../models/foodLog");
 //pros,cons,suggest imporovemnt in diet
 
 
-
-
-
-
 const generateAnalysis = async (req, res) => {
 
     const userId=req.user.id;
@@ -156,7 +152,7 @@ Instructions:
 Return ONLY valid JSON in this exact format:
 
 {
-  "score": number/number,
+  "score": number,
   "summary": "string",
   "strengths": [
     "string",

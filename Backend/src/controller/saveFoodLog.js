@@ -256,7 +256,7 @@ const getStreak = async (req, res) => {
         break;
       }
 
-      currDate.setDate(currDate.getDate() - 1);
+      currDate.setDate(currDate.getDate() - 1); //previous dates
     }
 
     return res.status(200).json({

@@ -16,6 +16,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { number } from "framer-motion";
 
 ChartJS.register(
   ArcElement,
@@ -30,7 +31,7 @@ export default function Dashboard() {
   type Food=typeof Fdata[number];
   type FoodLog = {
   id: number;
-  foodId: number;
+  foodId: string;
   name: string;
   emoji: string;
   quantity: number;
@@ -55,8 +56,7 @@ const [quant, setQuant] = useState("");
 
   });
    
-  const [editingId, setEditingId] = useState<number | null>(null);
-const [editQuantity, setEditQuantity] = useState("");
+const [editingId, setEditingId] = useState<string | null>(null);const [editQuantity, setEditQuantity] = useState("");
 const [currWeight, setCurrWeight] = useState<number | "">(()=>{
     const wDraft=localStorage.getItem("weD");
     return wDraft?Number(wDraft):"";
@@ -164,8 +164,8 @@ const totalCal=foodLog.reduce(
   (sum,item)=>sum+item.calories,0
 )
  
-const deleteFood=(id:Number)=>{
-       setFoodLog((e)=>e.filter((item)=>item.id!==id));
+const deleteFood=(id:string)=>{
+       setFoodLog((e)=>e.filter((item)=>item.foodId!==id));
 }
 
   const addFood=()=>{
@@ -197,7 +197,7 @@ if (existingFood) {
 } else{
      const newFood: FoodLog = {
         id: Date.now(),
-        foodId: food.id,
+        foodId: String(food.id),
         name: food.displayName,
         emoji: food.emoji,
         quantity,
@@ -216,10 +216,10 @@ setQuant("");
       
   }
   
-  const startEdit=(item:FoodLog)=>{
-       setEditingId(item.id);
-       setEditQuantity(item.quantity.toString());
-  }
+ const startEdit = (item: FoodLog) => {
+  setEditingId(item.foodId);
+  setEditQuantity(item.quantity.toString());
+};
 
   const saveEdit=()=>{
        
@@ -233,12 +233,12 @@ setQuant("");
   }
 
      setFoodLog((e)=>e.map((item)=>{
-         if(item.id!==editingId){
+         if(item.foodId!==editingId){
           return item;
          }
          else{
 
-    const food = Fdata.find((e) => e.id === item.foodId);
+    const food = Fdata.find((e) => e.id === Number(item.foodId));
 
     if(!food) return item;
 
@@ -479,10 +479,9 @@ const handleSave = async () => {
         <div className="order-6 flex flex-col gap-6  rounded-2xl border border-white/10 bg-[#171717] p-3 sm:rounded-3xl sm:p-6">
               <div className="flex justify-end">
 
-                {foodLog.length===0?(<></>)
-                :(<><button onClick={handleSave}   className="w-32 rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700 hover:scale-105  active:scale-95 transition">
+                <button onClick={handleSave}   className="w-32 rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700 hover:scale-105  active:scale-95 transition">
                    Save
-                 </button></>)}
+                 </button>
                  
                </div>
           {foodLog.length === 0 ? (
@@ -490,8 +489,9 @@ const handleSave = async () => {
           ) : (
             <div className="max-h-[420px] overflow-y-auto pr-2">
             <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-              {foodLog.map((item, index) => (
-                <div
+              {foodLog.map((item, index) => {
+                       console.log(item);
+                  return(<div
                   key={item.id ?? item.foodId ?? index}
                   className="
                     w-full
@@ -505,6 +505,7 @@ const handleSave = async () => {
                     hover:shadow-lg hover:shadow-orange-500/10
                   "
                 >
+                  
                   <div className="flex items-start justify-between">
                     <div>
                       <h3 className="flex items-center gap-2 font-semibold text-white">
@@ -512,7 +513,7 @@ const handleSave = async () => {
                         {item.name}
                       </h3>
 
-                      {editingId === item.id ? (
+                      {editingId === item.foodId ? (
                         <>
                           <Input placeholder="update" value={editQuantity} onChange={(e) => setEditQuantity(e.target.value)} />
                         </>
@@ -524,7 +525,7 @@ const handleSave = async () => {
                     </div>
 
                     <div className="flex gap-1">
-                      {editingId === item.id ? (
+                      {editingId === item.foodId ? (
                         <>
                           <button onClick={saveEdit} className="rounded-lg w-10 pb-2 text-2xl text-gray-400 transition hover:bg-orange-500/20 hover:text-orange-400">
                             ✔️
@@ -544,7 +545,7 @@ const handleSave = async () => {
 
                           <button
                             className="rounded-lg p-2 text-gray-400 transition hover:bg-red-500/20 hover:text-red-400"
-                            onClick={() => deleteFood(item.id)}
+                            onClick={() => deleteFood((item.foodId))}
                           >
                             <Trash2 size={18} />
                           </button>
@@ -570,8 +571,9 @@ const handleSave = async () => {
                       <p className="text-xs text-gray-500">Carbs</p>
                     </div>
                   </div>
-                </div>
-              ))}
+                         </div>)
+                
+                    })}
               </div>
             </div>
           )}
