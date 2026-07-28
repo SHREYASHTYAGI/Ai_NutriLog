@@ -88,3 +88,6 @@ FTracker
 └─ README.md
 
 ````
+
+
+![image alt](https://github.com/SHREYASHTYAGI/Ai_NutriLog/blob/main/images/Screenshot%202026-07-29%20002511.png?raw=true)
