@@ -5,7 +5,9 @@ const router=express.Router();
 const authMiddleware=require("../middleware/auth.middleware");
 
 const {registeredUser,sendOTP,loginUser,refreshToken,logOut}=require("../controller/auth.contoller");
-const {saveFoodLog,getFoodLog,getProgress}=require("../controller/saveFoodLog")
+const {saveFoodLog,getFoodLog,getProgress,getStreak}=require("../controller/saveFoodLog")
+
+const {generateAnalysis}=require("../controller/ai.contoller")
 
 router.post("/register",registeredUser);
 router.post("/otp",sendOTP);
@@ -24,9 +26,7 @@ router.get("/getme",authMiddleware,(req,res)=>{
 
 router.get("/foodLog/:date",authMiddleware,getFoodLog)
 router.get("/progress",authMiddleware,getProgress)
-router.get("/streak",authMiddleware,(req,res)=>{
-     res.status(200).json({
-       streak:streak,
-     })
-})
+router.get("/streak",authMiddleware,getStreak)
+router.post("/analysis",authMiddleware,generateAnalysis)
+
 module.exports=router;

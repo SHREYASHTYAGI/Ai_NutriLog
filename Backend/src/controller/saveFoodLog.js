@@ -1,5 +1,6 @@
 const { all } = require("../app");
 const { foodLogModel}=require("../models/foodLog");
+const userModel=require("../models/user.model") 
 
 const saveFoodLog=async(req,res)=>{
 try
@@ -186,4 +187,94 @@ const getProgress = async (req, res) => {
   }
 };
 
-module.exports={saveFoodLog,getFoodLog,getProgress};
+const getStreak = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const user = await userModel.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const calGoal = user.calorieGoal;
+    const proGoal = user.proteinGoal;
+
+    let streak = 0;
+
+    // Match frontend/MongoDB date format: local YYYY-MM-DD (not UTC via toISOString)
+    const toLocalDateString = (date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    };
+
+    let currDate = new Date();
+    currDate.setHours(0, 0, 0, 0);
+
+    while (true) {
+      const date = toLocalDateString(currDate);
+
+      console.log("[streak] searching date:", date, "userId:", userId);
+
+      const log = await foodLogModel.findOne({
+        userId,
+        date,
+      });
+
+      console.log("[streak] fetched log:", log ? { date: log.date, foodCount: log.foods.length } : null);
+
+      if (!log) {
+        console.log("[streak] no log for date, stopping. streak:", streak);
+        break;
+      }
+
+      let totalCal = 0;
+      let totalPro = 0;
+
+      log.foods.forEach((food) => {
+        totalCal += Number(food.calories || 0);
+        totalPro += Number(food.protein || 0);
+      });
+
+      console.log("[streak] totals:", {
+        totalCal,
+        totalPro,
+        calorieGoal: calGoal,
+        proteinGoal: proGoal,
+        goalsMet: totalCal >= calGoal && totalPro >= proGoal,
+      });
+
+      if (totalCal >= calGoal && totalPro >= proGoal) {
+        streak++;
+        console.log("[streak] day counted, streak now:", streak);
+      } else {
+        console.log("[streak] goals not met, stopping. streak:", streak);
+        break;
+      }
+
+      currDate.setDate(currDate.getDate() - 1);
+    }
+
+    return res.status(200).json({
+      success: true,
+      streak,
+    });
+  } catch (err) {
+    console.error("STREAK ERROR:", err);
+
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+module.exports = {
+  getStreak,
+};
+
+module.exports={saveFoodLog,getFoodLog,getProgress,getStreak};

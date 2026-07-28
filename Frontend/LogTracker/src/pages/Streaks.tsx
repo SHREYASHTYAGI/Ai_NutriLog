@@ -1,10 +1,28 @@
+import api from "../api/axios"
 import BottomNavbar from "../components/BottomNavbar";
 
-export default function Streaks() {
-  return (
-    <div className="min-h-screen bg-[#0B0707] text-white flex items-center justify-center">
-      <h1 className="text-5xl font-bold">Streaks</h1>
-      <BottomNavbar/>
-    </div>
-  );
+
+const handleGenerate = async () => {
+  try {
+    const res = await api.post("/analysis");
+
+    console.log(res.data.report);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export default function Streaks(){
+     return (
+      <> 
+          <button
+            onClick={handleGenerate}
+            className="rounded-xl bg-orange-500 px-5 py-3 text-white"
+          >
+            Generate Report
+          </button>
+             <BottomNavbar/>
+      </>
+        
+ )
 }

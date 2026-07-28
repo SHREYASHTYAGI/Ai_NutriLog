@@ -401,35 +401,67 @@ const handleSave = async () => {
           </div>
         </div>
 
-        <div className="order-5 flex h-auto flex-col justify-between rounded-2xl border border-white/10 bg-[#171717] p-3 sm:h-60 sm:rounded-3xl sm:p-6">
-          <div>
-            <h2 className="text-xl font-semibold text-white">🎯 Today's Target</h2>
-            <p className="mt-1 text-sm text-gray-400">Enter your current weight</p>
-          </div>
+        <div className="order-5 rounded-3xl border border-white/10 bg-[#171717] p-6">
 
-          <input
-            type="number"
-            placeholder="Weight (kg)"
-            value={currWeight}
-            onChange={(e) =>
-              setCurrWeight(e.target.value === "" ? "" : Number(e.target.value))
-            }
-            className="mt-3 rounded-xl border border-white/10 bg-[#202020] px-4 py-2 text-white outline-none transition focus:border-green-500"
-          />
+  {/* Header */}
+  <div className="flex items-center justify-between">
+    <div>
+      <h2 className="text-2xl font-bold text-white">
+        🎯 Today's Goals
+      </h2>
 
-          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:justify-between">
-            <div className="flex w-full flex-col rounded-2xl bg-[#202020] px-4 py-3 sm:w-[48%]">
-              <span className="text-sm text-gray-400">Protein</span>
-              <span className="mt-1 text-2xl font-bold text-green-400">🥩 <span className="text-green-300">{(totalProtein.toFixed(0))}</span>/{proteinGoal}g</span>
-            </div>
+      <p className="mt-1 text-sm text-gray-400">
+        Stay consistent and keep your streak alive.
+      </p>
+    </div>
 
-            <div className="flex w-full flex-col rounded-2xl bg-[#202020] px-4 py-3 sm:w-[48%]">
-              <span className="text-sm text-gray-400">Calories</span>
-              <span className="mt-1 text-2xl font-bold text-orange-400">🔥 <span className="text-orange-300" >{(totalCal.toFixed(0))}</span>/{calorieGoal}</span>
-            </div>
-          </div>
-           <h2>{streak}</h2>
-        </div>
+    <div className="text-right">
+    <p className="text-xs uppercase tracking-wide text-gray-500">
+        Streak
+    </p>
+
+    <h2 className="flex items-center justify-end gap-2 text-3xl font-bold text-orange-400">
+        🔥 {streak}
+    </h2>
+
+    <p className="text-sm text-gray-400">
+        {streak === 1 ? "Day" : "Days"}
+    </p>
+</div>
+  </div>
+
+  {/* Goals */}
+  <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+    <div className="rounded-2xl bg-[#202020] p-4 transition hover:border hover:border-green-500/30">
+      <p className="text-sm text-gray-400">
+        Protein
+      </p>
+
+      <h3 className="mt-2 text-3xl font-bold text-green-400">
+        🥩 {totalProtein.toFixed(0)}
+        <span className="text-lg text-green-300">
+          /{proteinGoal}g
+        </span>
+      </h3>
+    </div>
+
+    <div className="rounded-2xl bg-[#202020] p-4 transition hover:border hover:border-orange-500/30">
+      <p className="text-sm text-gray-400">
+        Calories
+      </p>
+
+      <h3 className="mt-2 text-3xl font-bold text-orange-400">
+        🔥 {totalCal.toFixed(0)}
+        <span className="text-lg text-orange-300">
+          /{calorieGoal}
+        </span>
+      </h3>
+    </div>
+
+  </div>
+
+</div>
       </div>
 
       <div className="order-2 space-y-4 sm:space-y-6 lg:col-span-8 lg:order-0">
@@ -458,9 +490,9 @@ const handleSave = async () => {
           ) : (
             <div className="max-h-[420px] overflow-y-auto pr-2">
             <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-              {foodLog.map((item) => (
+              {foodLog.map((item, index) => (
                 <div
-                  key={item.id}
+                  key={item.id ?? item.foodId ?? index}
                   className="
                     w-full
                     rounded-2xl

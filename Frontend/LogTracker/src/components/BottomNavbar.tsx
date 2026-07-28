@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   Home,
   BarChart3,
-  Flame,
+  Bot,
   User,
   LogOut,
 } from "lucide-react";
@@ -26,9 +26,9 @@ const navItems=[
         icon:BarChart3
     },
     {
-        name:"Streaks",
+        name:"Coach",
         path:"/streaks",
-        icon:Flame
+        icon:Bot
     },
     {
        name:"Profile",
