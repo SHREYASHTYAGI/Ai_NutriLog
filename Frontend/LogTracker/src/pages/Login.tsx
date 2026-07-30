@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-
+import { Home } from "lucide-react";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import api from "../api/axios";
@@ -36,6 +36,34 @@ export default function Login() {
     return (
 
   <div className="relative min-h-screen overflow-hidden bg-[#090909]">
+    <Link
+        to="/"
+        className="
+          absolute
+          left-6
+          top-6
+          z-20
+          flex
+          items-center
+          gap-2
+          rounded-xl
+          border
+          border-orange-500/40
+          bg-[#171717]/80
+          px-3
+          py-2
+          text-gray-400
+          backdrop-blur-sm
+          transition-all
+          duration-300
+          hover:border-orange-500/40
+          hover:bg-orange-500/10
+          hover:text-orange-400
+        "
+      >
+        <Home size={18} />
+        <span className="text-sm font-medium">Home</span>
+    </Link>
 
   {/* Background Blobs */}
   <div className="absolute -left-32 top-0 h-96 w-96 rounded-full bg-orange-500/20 blur-[140px]" />

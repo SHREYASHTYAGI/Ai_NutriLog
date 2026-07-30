@@ -7,6 +7,8 @@ import Input from "../components/Input";
 import api from "../api/axios";
 import DotGrid from "../components/DotGrid";
 
+import { Home } from "lucide-react";
+
 export default function Register() {
   const navigate = useNavigate();
 
@@ -83,6 +85,7 @@ export default function Register() {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#09070c] text-white">
+     
       <div className="absolute inset-0">
         <DotGrid
           dotSize={10}
@@ -98,7 +101,34 @@ export default function Register() {
         />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,107,53,0.22),_transparent_14%),linear-gradient(180deg,rgba(9,7,12,0.82),rgba(9,7,12,0.94))]" />
       </div>
-
+          <Link
+             to="/"
+             className="
+               absolute
+               left-6
+               top-6
+               z-20
+               flex
+               items-center
+               gap-2
+               rounded-xl
+               border
+               border-orange-500/40
+               bg-[#171717]/80
+               px-3
+               py-2
+               text-gray-400
+               backdrop-blur-md
+               transition-all
+               duration-300
+               hover:border-orange-500/40
+               hover:bg-orange-500/10
+               hover:text-orange-400
+             "
+           >
+             <Home size={18} />
+             <span className="text-sm font-medium">Home</span>
+        </Link>
       <div className="relative z-10 mx-auto flex min-h-screen items-center justify-center px-4 py-10">
         <motion.div
           initial={{ opacity: 0, y: 28 }}
@@ -117,9 +147,9 @@ export default function Register() {
               <p className="max-w-2xl text-sm leading-6 text-slate-300">Start tracking your nutrition today.</p>
             </div>
           </div>
-
+             
           <div className="rounded-[1.75rem] border border-white/10 bg-slate-950/70 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] sm:p-6">
-           
+             
 
             <form onSubmit={otpSent ? handleRegister : handleSentOTP} className="space-y-4">
               <AnimatePresence mode="wait">

@@ -1,0 +1,57 @@
+.neon-cursor-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+/* Main cursor */
+.cursor-main {
+  position: fixed;
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  background: #ff6b23;
+  box-shadow:
+    0 0 10px rgba(255, 107, 35, 0.9),
+    0 0 25px rgba(255, 107, 35, 0.65),
+    0 0 45px rgba(255, 107, 35, 0.35);
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* Trailing ring */
+.cursor-trail {
+  position: fixed;
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  border: 2px solid rgba(236, 101, 23, 0.85);
+  background: transparent;
+  box-shadow:
+    0 0 15px rgba(236, 101, 23, 0.35),
+    inset 0 0 10px rgba(236, 101, 23, 0.1);
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* Outer glow */
+.cursor-glow {
+  position: fixed;
+  width: 60px;
+  height: 60px;
+  border-radius: 9999px;
+  background: rgba(255, 107, 35, 0.12);
+  filter: blur(12px);
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* Hide custom cursor on touch devices */
+@media (pointer: coarse) {
+  .neon-cursor-container {
+    display: none;
+  }
+}
+
