@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Home } from "lucide-react";
+import { Eye, EyeOff, Home } from "lucide-react";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
+
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -13,6 +14,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { checkA, setIsLoggedIn } = useAuth();
+  const [hide,setHide]=useState<boolean>(true);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,25 +100,36 @@ export default function Login() {
 
       <form onSubmit={handleLogin} className="mt-8 space-y-5">
 
-        <Input
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+  <Input
+    placeholder="Email"
+    value={email}
+    onChange={(e) => setEmail(e.target.value)}
+  />
 
-        <Input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+  <div className="relative">
+    <Input
+      type={hide ? "password" : "text"}
+      placeholder="Password"
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+    />
 
-        <Button
-          text="Login"
-          type="submit"
-          loading={loading}
-        />
-      </form>
+    <button
+      type="button"
+      onClick={() => setHide(!hide)}
+      className="absolute right-3 top-1/2 -translate-y-1/2"
+    >
+      {hide ? <EyeOff size={20} /> : <Eye size={20} />}
+    </button>
+  </div>
+
+  <Button
+    text="Login"
+    type="submit"
+    loading={loading}
+  />
+
+</form>
 
       <div className="mt-8 text-center text-sm text-gray-400">
         Don't have an account?{" "}
@@ -125,6 +138,13 @@ export default function Login() {
           className="font-semibold text-orange-400 transition hover:text-orange-300"
         >
           Register
+        </Link> 
+        <br/>
+        <Link
+          to="/reset-pass"
+          className="font-semibold text-orange-400 transition hover:text-orange-300"
+        >
+          Forgot Password?
         </Link>
       </div>
     </div>
