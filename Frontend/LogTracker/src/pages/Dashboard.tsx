@@ -28,7 +28,7 @@ ChartJS.register(
 
 export default function Dashboard() {
 
-  type Food=typeof Fdata[number];
+  type Food = (typeof Fdata)[number];
   type FoodLog = {
   id: number;
   foodId: string;
