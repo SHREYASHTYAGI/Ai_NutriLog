@@ -16,7 +16,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { number } from "framer-motion";
+
 
 ChartJS.register(
   ArcElement,
