@@ -156,87 +156,103 @@ if (!isValidOTP) {
     }
 }
 
-const loginUser=async(req,res)=>{
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
-    try{
-         const{email,password}=req.body;
-
-         if (!email || !password) {
-    return res.status(400).json({
-        message: "Email and password are required"
-    });
-}
-
-    const user=await User.findOne({email});
-    if(!user){
-        return res.status(400).json({
-            message:"User with this email does not exists",
-        })
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and password are required",
+      });
     }
 
-    const decodedPass=await bcrypt.compare(password,user.password);
-    if(!decodedPass){
-        return res.status(400).json({
-            message:"Invalid password",
-        })
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "User with this email does not exist",
+      });
     }
 
-    const refreshToken=jwt.sign({
-        id:user._id,
+    const decodedPass = await bcrypt.compare(password, user.password);
 
-    },process.env.REF_SEC,{
-        expiresIn:"7d"
-    })
+    if (!decodedPass) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid password",
+      });
+    }
 
-    const hashRefresh=await bcrypt.hash(refreshToken,10);
+    const refreshToken = jwt.sign(
+      {
+        id: user._id,
+      },
+      process.env.REF_SEC,
+      {
+        expiresIn: "7d",
+      }
+    );
 
-    //Saving refreshtoken in database
+    const accessToken = jwt.sign(
+      {
+        id: user._id,
+        email: user.email,
+      },
+      process.env.ACC_SEC,
+      {
+        expiresIn: "15m",
+      }
+    );
+
     await tokenModel.deleteMany({
-    userId: user._id
+      userId: user._id,
     });
+
+    const hashRefresh = await bcrypt.hash(refreshToken, 10);
 
     await tokenModel.create({
-    userId: user._id,
-    token: hashRefresh,
-    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-});
+      userId: user._id,
+      token: hashRefresh,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    });
 
-    const accessToken=jwt.sign({
-        id:user._id,
-        email:user.email,
-    },process.env.ACC_SEC,{
-        expiresIn:"15m"
-    })
+    const isProduction = process.env.NODE_ENV === "production";
 
-    res.cookie("refreshToken",refreshToken,{
-        httpOnly:true,
-        maxAge:7*24*60*60*1000,
-        sameSite:"strict"
-    })
+    const cookieOptions = {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "None" : "Lax",
+    };
 
-    res.cookie("accessToken",accessToken,{
-        httpOnly:true,
-        maxAge:15*60*1000,
-        sameSite:"strict"
-    })
+    res.cookie("refreshToken", refreshToken, {
+      ...cookieOptions,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
-    res.status(200).json({
-    message: "User logged in successfully",
-    user: {
+    res.cookie("accessToken", accessToken, {
+      ...cookieOptions,
+      maxAge: 15 * 60 * 1000,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "User logged in successfully",
+      user: {
         id: user._id,
         name: user.name,
-        email: user.email
-    } 
-   });
-    }
-    catch(err){
-        console.log(err.message);
-    }
-
-
-
-   
-}
+        email: user.email,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
 
 const refreshToken = async (req, res) => {
     try {
@@ -309,34 +325,47 @@ const refreshToken = async (req, res) => {
     }
 };
 
-const logOut=async(req,res)=>{
-    try{
-          const oldrefreshToken=req.cookies.refreshToken;
-          if(oldrefreshToken){
-               try{
-                  const decoded=jwt.verify(oldrefreshToken,process.env.REF_SEC);
+const logOut = async (req, res) => {
+    try {
+        const oldRefreshToken = req.cookies.refreshToken;
 
-                  await tokenModel.deleteMany({
-                    userId:decoded.id
-                  })
-               }
-              catch(err){
-                 return res.status(500).json({
-                 message: err.message
-    });
-}
-          }
-          res.clearCookie("accessToken");
+        if (oldRefreshToken) {
+            try {
+                const decoded = jwt.verify(
+                    oldRefreshToken,
+                    process.env.REF_SEC
+                );
 
-        res.clearCookie("refreshToken");
+                await tokenModel.deleteMany({
+                    userId: decoded.id,
+                });
+            } catch (err) {
+                console.log("Refresh token already expired");
+            }
+        }
+
+        res.clearCookie("accessToken", {
+            httpOnly: true,
+            secure: true,
+            sameSite: "None",
+        });
+
+        res.clearCookie("refreshToken", {
+            httpOnly: true,
+            secure: true,
+            sameSite: "None",
+        });
 
         return res.status(200).json({
-            message: "Logged out successfully"
+            success: true,
+            message: "Logged out successfully",
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: err.message,
         });
     }
-    catch(err){
-        console.log(err.message);
-    }
-}
+};
 
 module.exports={registeredUser,sendOTP,loginUser,refreshToken,logOut};

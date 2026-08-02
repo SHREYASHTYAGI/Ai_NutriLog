@@ -37,5 +37,12 @@ router.post("/reset-password",resetPassword);
 router.post("/validate-otp",validateOTP)
 router.post("/update-password",updatePass)
 router.post("/reset-pass",authMiddleware,changePassword)
+router.get("/test", (req, res) => {
+  res.json({
+    success: true,
+    message: "Backend Updated",
+  });
+});
+
 
 module.exports=router;
