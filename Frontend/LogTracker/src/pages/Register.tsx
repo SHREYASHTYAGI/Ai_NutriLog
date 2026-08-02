@@ -87,19 +87,19 @@ export default function Register() {
     <div className="relative min-h-screen overflow-hidden bg-[#09070c] text-white">
      
       <div className="absolute inset-0">
-        <DotGrid
+        <DotGrid 
           dotSize={10}
           gap={15}
-          baseColor="#2a2c35"
-          activeColor="#ff8b4d"
+          baseColor="#4b5563"     
+          activeColor="#ff9a57"
           proximity={120}
           shockRadius={250}
           shockStrength={5}
           resistance={750}
           returnDuration={1.5}
-          className="absolute inset-0"
+          className="absolute inset-0 "
         />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,107,53,0.22),_transparent_14%),linear-gradient(180deg,rgba(9,7,12,0.82),rgba(9,7,12,0.94))]" />
+        <div className="absolute   inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,107,53,0.22),_transparent_15%),linear-gradient(180deg,rgba(9,7,12,0.82),rgba(9,7,12,0.94))]" />
       </div>
           <Link
              to="/"

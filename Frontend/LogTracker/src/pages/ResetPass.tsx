@@ -1,6 +1,7 @@
 import api from "../api/axios";
 import {useState} from "react";
 import {Link} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import {
   Mail,
@@ -37,6 +38,57 @@ export default function ResetPass(){
      }
     }
 
+    const validateOTP=async()=>{
+            try{
+              setLoading(true);
+                const response=await api.post("/validate-otp",{
+                  email,otp
+                })
+                setStep(3);
+                alert(response.data.message);
+            }
+            catch(err:any){
+              alert(err.response?.data?.message||err.message);
+            }
+        finally{
+        setLoading(false);
+      }
+    }
+
+    const updatePass=async()=>{
+      try{
+        setLoading(true);
+        const response=await api.post("/update-password",{
+          email,
+          password:newPass
+        })
+        alert(response.data.message);
+        navigate("/login");
+
+      }
+      catch(err:any){
+        alert(err.response?.data?.message||err.message);
+      }
+      finally{
+        setLoading(false);
+      }
+    }
+
+   const handleBtn=()=>{
+      if(step===1){
+        resetPass();
+      }
+      else if(step===2){
+        validateOTP();
+      }
+      else if(step===3){
+        updatePass();
+      }
+      
+   }
+
+
+   const navigate=useNavigate();
 
 
     return(
@@ -102,7 +154,8 @@ export default function ResetPass(){
       value={otp}
       onChange={(e) => setOtp(e.target.value)}
       placeholder="Enter OTP"
-      className="
+      disabled={step>=3}
+      className={`
         w-full
         rounded-2xl
         border border-white/10
@@ -117,7 +170,12 @@ export default function ResetPass(){
         duration-300
         focus:border-orange-500
         focus:shadow-[0_0_10px_rgba(249,115,22,.2)]
-      "
+         ${
+        step >= 3
+          ? "cursor-not-allowed border-green-500/30 bg-[#111111] text-zinc-400"
+          : "border-white/10 bg-[#202020] text-white placeholder:text-zinc-500 focus:border-orange-500 focus:shadow-[0_0_10px_rgba(249,115,22,.2)]"
+      }
+      `}
     />
   </div>
 )}
@@ -155,7 +213,7 @@ export default function ResetPass(){
     </div>
 
     <button
-      onClick={resetPass}
+      onClick={handleBtn}
       disabled={loading}
       className="
         mt-6

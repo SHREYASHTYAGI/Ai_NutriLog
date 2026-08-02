@@ -273,11 +273,11 @@ const Landing = () => {
                     py-4
                     font-semibold
                     text-white
-                    shadow-[0_0_30px_rgba(255,98,0,.45)]
+                    shadow-[0_0_15px_rgba(255,98,0,.45)]
                     transition-all
                     duration-300
                     hover:scale-105
-                    hover:shadow-[0_0_27px_rgba(255,98,0,.7)]
+                    hover:shadow-[0_0_10px_rgba(255,98,0,.25)]
                     active:scale-95
                     sm:w-auto
                   "
@@ -310,9 +310,9 @@ const Landing = () => {
                     duration-300
                     hover:scale-105
                     hover:border-orange-500
-                    hover:bg-orange-500/10
+                    hover:bg-orange-100/5
                     hover:text-orange-400
-                    hover:shadow-[0_0_20px_rgba(255,98,0,.25)]
+                    hover:shadow-[0_0_10px_rgba(255,98,0,.25)]
                     active:scale-95
                     sm:w-auto
                   "

@@ -10,6 +10,8 @@ const {saveFoodLog,getFoodLog,getProgress,getStreak}=require("../controller/save
 const {generateAnalysis}=require("../controller/ai.contoller")
 
 const {resetPassword}=require("../controller/resetPass")
+const {validateOTP,updatePass}=require("../controller/validate-OTP")
+const {changePassword}=require("../controller/newPass")
 
 router.post("/register",registeredUser);
 router.post("/otp",sendOTP);
@@ -32,5 +34,8 @@ router.get("/streak",authMiddleware,getStreak)
 router.post("/analysis",authMiddleware,generateAnalysis)
 
 router.post("/reset-password",resetPassword);
+router.post("/validate-otp",validateOTP)
+router.post("/update-password",updatePass)
+router.post("/reset-pass",authMiddleware,changePassword)
 
 module.exports=router;

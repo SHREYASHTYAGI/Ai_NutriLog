@@ -8,6 +8,7 @@ import Progress from "./pages/Progress";
 import Streaks from "./pages/Streaks";
 import Profile from "./pages/Profile";
 import ResetPass from "./pages/ResetPass";
+import NewPass from "./pages/NewPass";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -25,7 +26,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/progress" element={<Progress />} />
             <Route path="/streaks" element={<Streaks />} />
-            
+            <Route path="/new-pass" element={<NewPass />} />
             <Route path="/profile" element={<Profile />} />
           </Route>
         </Routes>

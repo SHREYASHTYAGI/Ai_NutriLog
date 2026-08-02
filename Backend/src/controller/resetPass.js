@@ -38,6 +38,7 @@ const resetPassword=async(req,res)=>{
      await OTP.deleteMany({email});
 
       const otp= crypto.randomInt(100000,999999).toString();
+      console.log("Original OTP:", otp);
 
       const hOtp=crypto.createHash("sha256").update(otp).digest("hex");
       await OTP.create({
